@@ -12,39 +12,46 @@
 # EXPOSE 80
 
 
+ARG VERSION=v0.9.5
 
-FROM rust:1.44.1-slim-buster AS builder
+# FROM rust:1.48.0-slim AS builder
+FROM rust:alpine-3.15 AS builder
 
-ARG VERSION=v0.9.0
-ENV REPO=https://github.com/romanz/electrs.git
+ARG VERSION
 
 WORKDIR /build
 
-RUN apt-get update
-RUN apt-get install -y git cargo clang cmake libsnappy-dev
+# RUN apt-get update
+# RUN apt-get install -y git clang cmake libsnappy-dev
 
-RUN git clone --branch $VERSION $REPO .
+RUN apk update
+RUN apk add -y git clang cmake libsnappy-dev
 
-RUN cargo build --release --bin electrs
+# RUN git clone --branch $VERSION https://github.com/romanz/electrs .
 
+COPY ./electrs ./electrs
 
-FROM debian:buster-slim
+RUN cargo install --locked --path .
 
-COPY --from=builder /build/target/release/electrs /bin/electrs
+# FROM debian:buster-slim
+FROM FROM alpine:3.15 AS builder
 
-# Electrum RPC Mainnet
+RUN adduser --disabled-password --uid 1000 --home /data --gecos "" electrs
+USER electrs
+WORKDIR /data
+
+COPY --from=builder /usr/local/cargo/bin/electrs /bin/electrs
+
+ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
+RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
+
+# Electrum RPC
 EXPOSE 50001
-# Electrum RPC Testnet
-EXPOSE 60001
-# Electrum RPC Regtest
-EXPOSE 60401
 
 # Prometheus monitoring
 EXPOSE 4224
 
 STOPSIGNAL SIGINT
 
-HEALTHCHECK CMD curl -fSs http://localhost:4224/ || exit 1
-
-# ENTRYPOINT [ "electrs" ]
-ENTRYPOINT ["/usr/local/bin/docker_entrypoint.sh"]
+# ENTRYPOINT ["electrs"]
+ENTRYPOINT ["docker_entrypoint.sh"]
