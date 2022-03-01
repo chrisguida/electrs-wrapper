@@ -1,7 +1,7 @@
 # v0.3.0 and up Manifest example written in yaml (toml and json are also acceptable)
 
 id: electrs
-title: "Hello World"
+title: "ElectRS"
 version: 0.9.5
 release-notes: "Initial release for EmbassyOS"
 license: mit
@@ -26,19 +26,19 @@ main:
   args: []
   mounts:
     main: /data
-# health-checks:
-#   main:
-#     name: Electrum Interface
-#     success-image: The electrum interface is operational.
-#     type: docker
-#     image: main
-#     entrypoint: "check-electrum.sh"
-#     args: []
-#     inject: true
-#     system: false
-#     io-format: json
-config: ~
-properties: ~
+health-checks:
+  main:
+    name: Electrum Interface
+    success-message: The electrum interface is operational.
+    type: docker
+    image: main
+    entrypoint: "check-electrum.sh"
+    args: []
+    inject: true
+    system: false
+    io-format: json
+# config: ~
+# properties: ~
 volumes:
   main:
     type: data
@@ -51,15 +51,15 @@ interfaces:
     tor-config:
       port-mapping:
         50001: "50001"
-    lan-config:
-      50001:
-        ssl: true
-        mapping: 50001
+    # lan-config:
+    #   50001:
+    #     ssl: true
+    #     internal: 50001
     ui: false
     protocols:
       - tcp
       - electrum
-alerts: ~
+# alerts: ~
 backup:
   create:
     type: docker
