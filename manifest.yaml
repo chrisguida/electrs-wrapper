@@ -1,0 +1,199 @@
+# v0.3.0 and up Manifest example written in yaml (toml and json are also acceptable)
+
+id: electrs
+title: "ElectRS"
+version: 0.9.5
+release-notes: "Initial release for EmbassyOS"
+license: mit
+wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
+upstream-repo: "https://github.com/romanz/electrs"
+support-site: "https://github.com/romanz/electrs/issues"
+marketing-site: "https://github.com/romanz/electrs"
+build: ["make"]
+description:
+  short: An efficient re-implementation of Electrum Server in Rust 
+  long: |
+    An efficient re-implementation of Electrum Server, inspired by ElectrumX, Electrum Personal Server and bitcoincore-indexd. The motivation behind this project is to enable a user to self host an Electrum server, with required hardware resources not much beyond those of a full node. The server indexes the entire Bitcoin blockchain, and the resulting index enables fast queries for any given user wallet, allowing the user to keep real-time track of balances and transaction history using the Electrum wallet. Since it runs on the users own machine, there is no need for the wallet to communicate with external Electrum servers, thus preserving the privacy of the users addresses and balances.
+assets:
+  license: LICENSE
+  icon: icon.png
+  instructions: instructions.md
+  docker-images: image.tar
+main:
+  type: docker
+  image: main
+  entrypoint: "docker_entrypoint.sh"
+  args: []
+  mounts:
+    main: /data
+health-checks:
+  main:
+    name: Electrum Interface
+    success-message: The electrum interface is operational.
+    type: docker
+    image: main
+    entrypoint: "sh"
+    args: ["-c", "exit 0"]
+    inject: true
+    system: false
+    io-format: json
+config:
+  get:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - config
+      - get
+      - /root
+      - "/mnt/assets/config_spec.yaml"
+    mounts:
+      compat: /mnt/assets
+      main: /root
+    io-format: yaml
+  set:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - config
+      - set
+      - electrs
+      - /root
+      - "/mnt/assets/config_rules.yaml"
+    mounts:
+      compat: /mnt/assets
+      main: /root
+    io-format: yaml
+# properties: ~
+volumes:
+  main:
+    type: data
+  compat:
+    type: assets 
+interfaces:
+  electrum:
+    name: Electrum Interface
+    description: Serves an electrum API for use with compatible wallets
+    tor-config:
+      port-mapping:
+        50001: "50001"
+    # lan-config:
+    #   50001:
+    #     ssl: true
+    #     internal: 50001
+    ui: false
+    protocols:
+      - tcp
+      - electrum
+# alerts: ~
+dependencies:
+  btc-rpc-proxy:
+    version: ">=0.3.2.1 <0.4.0"
+    requirement:
+      type: "opt-out"
+      how: Can alternatively use the internal full archival bitcoind node or configure an external bitcoin node.
+    description: Used to fetch validated blocks.
+    config:
+      check:
+        type: docker
+        image: compat
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - check
+          - electrs
+          - "btc-rpc-proxy"
+          - /data
+          - "/mnt/assets/btc-rpc-proxy.rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /data
+        io-format: yaml
+      auto-configure:
+        type: docker
+        image: compat
+        # if true, the denoted image is prebuilt and comes stock with EOS
+        # uncommon: if you want something not prebuilt with EOS, you can bundle multiple docker images into the `image.tar` during the `make` build process
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - "auto-configure"
+          - electrs
+          - "btc-rpc-proxy"
+          - /data
+          - "/mnt/assets/btc-rpc-proxy.rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /data
+        io-format: yaml
+  bitcoind:
+    version: ">=0.21.1.2 <23.0.0"
+    requirement:
+      type: "opt-out"
+      how: Can alternatively configure an external bitcoin node.
+    description: Used to subscribe to new block events.
+    config:
+      check:
+        type: docker
+        image: compat
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - check
+          - electrs
+          - bitcoind
+          - /data
+          - "/mnt/assets/bitcoind.rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /data
+        io-format: yaml
+      auto-configure:
+        type: docker
+        image: compat
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - "auto-configure"
+          - electrs
+          - bitcoind
+          - /data
+          - "/mnt/assets/bitcoind.rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /data
+        io-format: yaml
+backup:
+  create:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
+  restore:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /data
+      - /mnt/backup
+    mounts:
+      BACKUP: /mnt/backup
+      main: /data
