@@ -32,11 +32,12 @@ health-checks:
     success-message: The electrum interface is operational.
     type: docker
     image: main
-    entrypoint: "sh"
-    args: ["-c", "exit 0"]
-    inject: true
     system: false
+    entrypoint: check-electrum.sh
+    args: []
+    mounts: {}
     io-format: json
+    inject: true
 config:
   get:
     type: docker
