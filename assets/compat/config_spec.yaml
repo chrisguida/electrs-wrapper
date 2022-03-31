@@ -98,37 +98,43 @@ bitcoind:
             range: "[0,65535]"
             integral: true
             default: 8333
-log-filters:
-  type: enum
-  name: Log Filters
-  values:
-    - ERROR
-    - WARN
-    - INFO
-    - DEBUG
-    - TRACE
-  value-names:
-    ERROR: Error
-    WARN: Warning
-    INFO: Info
-    DEBUG: Debug
-    TRACE: Trace
-  default: "INFO"
-index-batch-size:
-  type: number
-  name: Index Batch Size
-  description: |
-    Maximum number of blocks to request from bitcoind per batch
-  nullable: true
-  range: "[1,10000]"
-  integral: true
-  units: blocks
-index-lookup-limit:
-  type: number
-  name: Index Lookup Limit
-  description: |
-    Number of transactions to lookup before returning an error, to prevent 'too popular' addresses from causing the RPC server to get stuck (0 - disable the limit)"
-  nullable: true
-  range: "[1,10000]"
-  integral: true
-  units: transactions
+advanced:
+  type: object
+  name: Advanced
+  description: Advanced settings for Bitcoin Proxy
+  nullable: false
+  spec:
+    log-filters:
+      type: enum
+      name: Log Filters
+      values:
+        - ERROR
+        - WARN
+        - INFO
+        - DEBUG
+        - TRACE
+      value-names:
+        ERROR: Error
+        WARN: Warning
+        INFO: Info
+        DEBUG: Debug
+        TRACE: Trace
+      default: "INFO"
+    index-batch-size:
+      type: number
+      name: Index Batch Size
+      description: |
+        Maximum number of blocks to request from bitcoind per batch
+      nullable: true
+      range: "[1,10000]"
+      integral: true
+      units: blocks
+    index-lookup-limit:
+      type: number
+      name: Index Lookup Limit
+      description: |
+        Number of transactions to lookup before returning an error, to prevent 'too popular' addresses from causing the RPC server to get stuck (0 - disable the limit)"
+      nullable: true
+      range: "[1,10000]"
+      integral: true
+      units: transactions

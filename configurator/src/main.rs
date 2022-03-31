@@ -35,6 +35,12 @@ fn parse_quick_connect_url(url: Uri) -> Result<(String, String, String, u16), an
 #[serde(rename_all = "kebab-case")]
 struct Config {
     bitcoind: BitcoinCoreConfig,
+    advanced: AdvancedConfig,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct AdvancedConfig {
     log_filters: String,
     index_batch_size: Option<u16>,
     index_lookup_limit: Option<u16>,
@@ -107,10 +113,15 @@ fn main() -> Result<(), anyhow::Error> {
                 let hostname = format!("{}", "bitcoind.embassy");
                 (user, password, hostname.clone(), 8332, hostname, 8333)
             }
-            BitcoinCoreConfig::InternalProxy { user, password } => {
-                let hostname = format!("{}", "btc-rpc-proxy.embassy");
-                (user, password, hostname.clone(), 8332, hostname, 8333)
-            }
+            BitcoinCoreConfig::InternalProxy { user, password } => (
+                user,
+                password,
+                format!("{}", "btc-rpc-proxy.embassy"),
+                8332,
+                // use bitcoin p2p interface. this requires bitcoind to be defined in dependencies.yaml
+                format!("{}", "bitcoind.embassy"),
+                8333,
+            ),
             BitcoinCoreConfig::External {
                 host,
                 rpc_user,
@@ -142,14 +153,19 @@ fn main() -> Result<(), anyhow::Error> {
         };
 
         let mut index_batch_size: String = "".to_string();
-        if config.index_batch_size.is_some() {
-            index_batch_size = format!("index_batch_size = {}", config.index_batch_size.unwrap());
+        if config.advanced.index_batch_size.is_some() {
+            index_batch_size = format!(
+                "index_batch_size = {}",
+                config.advanced.index_batch_size.unwrap()
+            );
         }
 
         let mut index_lookup_limit: String = "".to_string();
-        if config.index_lookup_limit.is_some() {
-            index_lookup_limit =
-                format!("index_batch_size = {}", config.index_lookup_limit.unwrap());
+        if config.advanced.index_lookup_limit.is_some() {
+            index_lookup_limit = format!(
+                "index_batch_size = {}",
+                config.advanced.index_lookup_limit.unwrap()
+            );
         }
 
         write!(
@@ -161,7 +177,7 @@ fn main() -> Result<(), anyhow::Error> {
             bitcoin_rpc_port = bitcoin_rpc_port,
             bitcoin_p2p_host = bitcoin_p2p_host,
             bitcoin_p2p_port = bitcoin_p2p_port,
-            log_filters = config.log_filters,
+            log_filters = config.advanced.log_filters,
             index_batch_size = index_batch_size,
             index_lookup_limit = index_lookup_limit,
         )?;

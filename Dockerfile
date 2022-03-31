@@ -13,7 +13,7 @@ RUN cargo install --locked --path .
 
 FROM debian:buster-slim
 
-RUN apt update && apt install -y bash curl tini
+RUN apt update && apt install -y bash netcat tini
 
 COPY --from=builder /usr/local/cargo/bin/electrs /bin/electrs
 

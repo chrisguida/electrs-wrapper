@@ -16,10 +16,10 @@ clean:
 	rm -f image.tar
 	rm -f electrs.s9pk
 
-electrs.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
+electrs.s9pk: manifest.yaml assets/compat/* image.tar instructions.md $(ASSET_PATHS)
 	embassy-sdk pack
 
-image.tar: Dockerfile check-electrum.sh docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator
+image.tar: Dockerfile check-electrum.sh docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(ELECTRS_SRC)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/electrs/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
 
 configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)

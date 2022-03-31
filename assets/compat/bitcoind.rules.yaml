@@ -10,14 +10,8 @@
     - SET:
         var: "advanced.peers.listen"
         to-value: true
-- rule: "!(advanced.peers.onlyconnect?)"
-  description: "Must have peer interface disabled"
-  suggestions:
-    - SET:
-        var: "advanced.peers.onlyconnect"
-        to-value: false
 - rule: "!(advanced.peers.onlyonion?)"
-  description: "Peer interface must allow clearnet connections"
+  description: "Must allow inbound clearnet peer connections"
   suggestions:
     - SET:
         var: "advanced.peers.onlyonion"

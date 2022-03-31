@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
+echo 'db/' > /data/.backupignore
+echo 'core' >> /data/.backupignore
 
 configurator
 exec tini electrs

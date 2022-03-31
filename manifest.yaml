@@ -2,7 +2,7 @@
 
 id: electrs
 title: "ElectRS"
-version: 0.9.5
+version: 0.9.6
 release-notes: "Initial release for EmbassyOS"
 license: mit
 wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
@@ -63,6 +63,7 @@ config:
       - electrs
       - /root
       - "/mnt/assets/config_rules.yaml"
+      - "/mnt/assets/dependencies.yaml"
     mounts:
       compat: /mnt/assets
       main: /root
@@ -80,22 +81,20 @@ interfaces:
     tor-config:
       port-mapping:
         50001: "50001"
-    # lan-config:
-    #   50001:
-    #     ssl: true
-    #     internal: 50001
     ui: false
     protocols:
       - tcp
       - electrum
-# alerts: ~
+alerts:
+  install: "INSTABILITY WARNING: Electrs uses up to 1GB of RAM when syncing. Please make sure you have at least this much free RAM before starting Electrs, or you will cause your system to become unresponsive! This is especially risky if running alongside Mastodon on a 4GB system!"
+  start: "INSTABILITY WARNING: Electrs uses up to 1GB of RAM when syncing. Please make sure you have at least this much free RAM before starting Electrs, or you will cause your system to become unresponsive! This is especially risky if running alongside Mastodon on a 4GB system!"
 dependencies:
   btc-rpc-proxy:
     version: ">=0.3.2.1 <0.4.0"
     requirement:
       type: "opt-out"
-      how: Can alternatively use the internal full archival bitcoind node or configure an external bitcoin node.
-    description: Used to fetch validated blocks.
+      how: Set "Bitcoin Core" to "Internal (Bitcoin Core)" or "External"
+    description: Provides bitcoin rpc interface needed for info about fees, blockchain, mempool, network, and transactions. Can also use bitcoind for rpc interface, or an external node for both.
     config:
       check:
         type: docker
@@ -116,8 +115,6 @@ dependencies:
       auto-configure:
         type: docker
         image: compat
-        # if true, the denoted image is prebuilt and comes stock with EOS
-        # uncommon: if you want something not prebuilt with EOS, you can bundle multiple docker images into the `image.tar` during the `make` build process
         system: true
         entrypoint: compat
         args:
@@ -135,8 +132,8 @@ dependencies:
     version: ">=0.21.1.2 <23.0.0"
     requirement:
       type: "opt-out"
-      how: Can alternatively configure an external bitcoin node.
-    description: Used to subscribe to new block events.
+      how: Set "Bitcoin Core" type to "External"
+    description: Needed for peer interface and rpc interface. Can also use btc-rpc-proxy for rpc interface, or an external node for both.
     config:
       check:
         type: docker
@@ -192,8 +189,8 @@ backup:
     args:
       - duplicity
       - restore
-      - /data
       - /mnt/backup
+      - /data
     mounts:
       BACKUP: /mnt/backup
       main: /data
