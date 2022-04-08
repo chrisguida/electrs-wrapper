@@ -30,6 +30,12 @@
     - PUSH:
         to: 'users.[first(item => ''item.name = "electrs")].allowed-calls'
         value: "getblockchaininfo"
+- rule: '''users.[first(item => ''item.name = "electrs")].allowed-calls.* = "getblockcount"'
+  description: 'RPC user "electrs" must have "getblockcount" enabled'
+  suggestions:
+    - PUSH:
+        to: 'users.[first(item => ''item.name = "electrs")].allowed-calls'
+        value: "getblockcount"
 - rule: '''users.[first(item => ''item.name = "electrs")].allowed-calls.* = "getmempoolentry"'
   description: 'RPC user "electrs" must have "getmempoolentry" enabled'
   suggestions:
