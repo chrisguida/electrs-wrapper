@@ -1,7 +1,7 @@
 # v0.3.0 and up Manifest example written in yaml (toml and json are also acceptable)
 
 id: electrs
-title: "ElectRS"
+title: "electrs"
 version: 0.9.6
 release-notes: "Initial release for EmbassyOS"
 license: mit
@@ -78,7 +78,18 @@ config:
       compat: /mnt/assets
       main: /root
     io-format: yaml
-# properties: ~
+properties:
+  type: docker
+  image: compat
+  system: true
+  entrypoint: compat
+  args:
+    - properties
+    - /root
+  mounts:
+    main: /root
+    compat: /mnt/assets
+  io-format: yaml
 volumes:
   main:
     type: data
@@ -91,9 +102,14 @@ interfaces:
     tor-config:
       port-mapping:
         50001: "50001"
+    # lan-config:
+    #   443:
+    #     ssl: true
+    #     internal: 50001
     ui: false
     protocols:
       - tcp
+      - http
       - electrum
 alerts:
   install: "INSTABILITY WARNING: Electrs uses up to 1GB of RAM when syncing. Please make sure you have at least this much free RAM before starting Electrs, or you will cause your system to become unresponsive! This is especially risky if running alongside Mastodon on a 4GB system!"
@@ -204,3 +220,20 @@ backup:
     mounts:
       BACKUP: /mnt/backup
       main: /data
+migrations:
+  from:
+    "=0.9.6":
+        type: docker
+        image: main
+        entrypoint: sh
+        args: ["-c", 'json=''{"configured": true }'' && echo "$json"']
+        io-format: json
+        inject: true
+  to:
+    "=0.9.6":
+        type: docker
+        image: main
+        entrypoint: sh
+        args: ["-c", 'json=''{"configured": true }'' && echo "$json"']
+        io-format: json
+        inject: true
