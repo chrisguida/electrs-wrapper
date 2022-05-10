@@ -2,7 +2,7 @@
 
 id: electrs
 title: "electrs"
-version: 0.9.6
+version: 0.9.7
 release-notes: "Initial release for EmbassyOS"
 license: mit
 wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
@@ -222,7 +222,7 @@ backup:
       main: /data
 migrations:
   from:
-    "=0.9.6":
+    "<=0.9.7":
         type: docker
         image: main
         entrypoint: sh
@@ -230,7 +230,7 @@ migrations:
         io-format: json
         inject: true
   to:
-    "=0.9.6":
+    "<=0.9.7":
         type: docker
         image: main
         entrypoint: sh
