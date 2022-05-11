@@ -1,4 +1,3 @@
-# Available Wallets
 
 ## BitBox App
 
@@ -10,7 +9,17 @@ Available for:
 - Mac
 - Windows
 
-Follow the [guide](./integrations/bitbox)
+[Setup guide](./integrations/bitbox)
+
+## BlueWallet
+
+https://bluewallet.io/
+
+Available for:
+- Android
+- iOS (Not currently supported due to bugs in the app)
+
+[Setup guide](./integrations/bluewallet)
 
 ## Electrum
 
@@ -22,7 +31,7 @@ Available for:
 - Mac
 - Windows
 
-Follow the [guide](./integrations/electrum)
+[Setup guide](./integrations/electrum)
 
 ## Sparrow
 
@@ -33,4 +42,4 @@ Available for:
 - Mac
 - Windows
 
-Follow the [guide](./integrations/sparrow)
+[Setup guide](./integrations/sparrow)
