@@ -14,8 +14,8 @@
 
 ```
 git clone https://github.com/Start9Labs/electrs-wrapper.git
-git submodule update --init
 cd electrs-wrapper
+git submodule update --init
 ```
 
 ## Building
