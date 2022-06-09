@@ -2,8 +2,8 @@
 
 id: electrs
 title: "electrs"
-version: 0.9.7
-release-notes: "Initial release for EmbassyOS"
+version: 0.9.7.1
+release-notes: "Version bump for latest Bitcoin"
 license: mit
 wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
 upstream-repo: "https://github.com/romanz/electrs"
@@ -155,7 +155,7 @@ dependencies:
           main: /data
         io-format: yaml
   bitcoind:
-    version: ">=0.21.1.2 <23.0.0"
+    version: ">=0.21.1.2 <24.0.0"
     requirement:
       type: "opt-out"
       how: Set "Bitcoin Core" type to "External"
