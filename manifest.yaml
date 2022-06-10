@@ -222,18 +222,20 @@ backup:
       main: /data
 migrations:
   from:
-    "<=0.9.7":
-        type: docker
-        image: main
-        entrypoint: sh
-        args: ["-c", 'json=''{"configured": true }'' && echo "$json"']
-        io-format: json
-        inject: true
+    "<=0.9.7.1":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
+      inject: false
   to:
-    "<=0.9.7":
-        type: docker
-        image: main
-        entrypoint: sh
-        args: ["-c", 'json=''{"configured": true }'' && echo "$json"']
-        io-format: json
-        inject: true
+    "<=0.9.7.1":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
+      inject: false
