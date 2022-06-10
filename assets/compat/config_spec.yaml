@@ -24,7 +24,7 @@ bitcoind:
       The Bitcoin Core node to connect to:
         - internal: The Bitcoin Core and Proxy services installed to your Embassy
         - external: An unpruned Bitcoin Core node running on a different device
-  default: internal
+  default: internal-proxy
   variants:
     internal:
       user:
