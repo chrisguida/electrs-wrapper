@@ -24,3 +24,7 @@ image.tar: Dockerfile check*.sh docker_entrypoint.sh configurator/target/aarch64
 
 configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)
 	docker run --rm -it -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:aarch64-musl cargo build --release
+
+scripts/embassy.js: scripts/**/*.ts
+	deno cache --reload scripts/embassy.ts
+	deno bundle scripts/embassy.ts scripts/embassy.js

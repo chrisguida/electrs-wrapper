@@ -49,52 +49,14 @@ health-checks:
     io-format: json
 config:
   get:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - get
-      - /root
-      - "/mnt/assets/config_spec.yaml"
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    io-format: yaml
+    type: script
   set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - electrs
-      - /root
-      - "/mnt/assets/config_rules.yaml"
-      - "/mnt/assets/dependencies.yaml"
-    mounts:
-      compat: /mnt/assets
-      main: /root
-    io-format: yaml
+    type: script
 properties:
-  type: docker
-  image: compat
-  system: true
-  entrypoint: compat
-  args:
-    - properties
-    - /root
-  mounts:
-    main: /root
-    compat: /mnt/assets
-  io-format: yaml
+  type: script
 volumes:
   main:
     type: data
-  compat:
-    type: assets 
 interfaces:
   electrum:
     name: Electrum Interface
@@ -123,37 +85,9 @@ dependencies:
     description: Provides bitcoin rpc interface needed for info about fees, blockchain, mempool, network, and transactions. Can also use bitcoind for rpc interface, or an external node for both.
     config:
       check:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - check
-          - electrs
-          - "btc-rpc-proxy"
-          - /data
-          - "/mnt/assets/btc-rpc-proxy.rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /data
-        io-format: yaml
+        type: script
       auto-configure:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - "auto-configure"
-          - electrs
-          - "btc-rpc-proxy"
-          - /data
-          - "/mnt/assets/btc-rpc-proxy.rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /data
-        io-format: yaml
+        type: script
   bitcoind:
     version: ">=0.21.1.2 <24.0.0"
     requirement:
@@ -162,37 +96,9 @@ dependencies:
     description: Needed for peer interface and rpc interface. Can also use btc-rpc-proxy for rpc interface, or an external node for both.
     config:
       check:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - check
-          - electrs
-          - bitcoind
-          - /data
-          - "/mnt/assets/bitcoind.rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /data
-        io-format: yaml
+        type: script
       auto-configure:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - "auto-configure"
-          - electrs
-          - bitcoind
-          - /data
-          - "/mnt/assets/bitcoind.rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /data
-        io-format: yaml
+        type: script
 backup:
   create:
     type: docker
