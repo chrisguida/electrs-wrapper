@@ -1,141 +1,120 @@
-import { matches, YAML, ExpectedExports } from "../deps.ts";
+import { types as T, compat } from "../deps.ts";
 
-const { any, string, dictionary } = matches;
 
-const matchConfig = dictionary([string, any]);
-
-export const getConfig: ExpectedExports.getConfig = async (effects) => {
-  const config = await effects
-    .readFile({
-      path: "start9/config.yaml",
-      volumeId: "main",
-    })
-    .then((x) => YAML.parse(x))
-    .then((x) => matchConfig.unsafeCast(x))
-    .catch((e) => {
-      effects.warn(`Got error ${e} while trying to read the config`);
-      return undefined;
-    });
-  return {
-    result: {
-      config,
-      spec: {
-        "electrum-tor-address": {
-          "name": "Electrum Tor Address",
-          "description": "The Tor address for the electrum interface.",
+export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
+  "electrum-tor-address": {
+    "name": "Electrum Tor Address",
+    "description": "The Tor address for the electrum interface.",
+    "type": "pointer",
+    "subtype": "package",
+    "package-id": "electrs",
+    "target": "tor-address",
+    "interface": "electrum"
+  },
+  "bitcoind": {
+    "type": "union",
+    "name": "Bitcoin Core",
+    "description": "The Bitcoin Core node to connect to:\n  - internal: The Bitcoin Core or Proxy services installed to your Embassy\n  - external: An unpruned Bitcoin Core node running on a different device\n",
+    "tag": {
+      "id": "type",
+      "name": "Type",
+      "variant-names": {
+        "internal": "Internal (Bitcoin Core)",
+        "internal-proxy": "Internal (Bitcoin Proxy)",
+        "external": "External"
+      },
+      "description": "The Bitcoin Core node to connect to:\n  - internal: The Bitcoin Core and Proxy services installed to your Embassy\n  - external: An unpruned Bitcoin Core node running on a different device\n"
+    },
+    "default": "internal-proxy",
+    "variants": {
+      "internal": {
+        "user": {
           "type": "pointer",
+          "name": "RPC Username",
+          "description": "The username for Bitcoin Core's RPC interface",
           "subtype": "package",
-          "package-id": "electrs",
-          "target": "tor-address",
-          "interface": "electrum"
+          "package-id": "bitcoind",
+          "target": "config",
+          "multi": false,
+          "selector": "$.rpc.username"
         },
-        "bitcoind": {
-          "type": "union",
-          "name": "Bitcoin Core",
-          "description": "The Bitcoin Core node to connect to:\n  - internal: The Bitcoin Core or Proxy services installed to your Embassy\n  - external: An unpruned Bitcoin Core node running on a different device\n",
-          "tag": {
-            "id": "type",
-            "name": "Type",
-            "variant-names": {
-              "internal": "Internal (Bitcoin Core)",
-              "internal-proxy": "Internal (Bitcoin Proxy)",
-              "external": "External"
-            },
-            "description": "The Bitcoin Core node to connect to:\n  - internal: The Bitcoin Core and Proxy services installed to your Embassy\n  - external: An unpruned Bitcoin Core node running on a different device\n"
-          },
-          "default": "internal-proxy",
-          "variants": {
-            "internal": {
-              "user": {
-                "type": "pointer",
-                "name": "RPC Username",
-                "description": "The username for Bitcoin Core's RPC interface",
-                "subtype": "package",
-                "package-id": "bitcoind",
-                "target": "config",
-                "multi": false,
-                "selector": "$.rpc.username"
-              },
-              "password": {
-                "type": "pointer",
-                "name": "RPC Password",
-                "description": "The password for Bitcoin Core's RPC interface",
-                "subtype": "package",
-                "package-id": "bitcoind",
-                "target": "config",
-                "multi": false,
-                "selector": "$.rpc.password"
-              }
-            },
-            "internal-proxy": {
-              "user": {
-                "type": "pointer",
-                "name": "RPC Username",
-                "description": "The username for the RPC user allocated to electrs",
-                "subtype": "package",
-                "package-id": "btc-rpc-proxy",
-                "target": "config",
-                "multi": false,
-                "selector": "$.users[?(@.name == \"electrs\")].name"
-              },
-              "password": {
-                "type": "pointer",
-                "name": "RPC Password",
-                "description": "The password for the RPC user allocated to electrs",
-                "subtype": "package",
-                "package-id": "btc-rpc-proxy",
-                "target": "config",
-                "multi": false,
-                "selector": "$.users[?(@.name == \"electrs\")].password"
-              }
-            }
-          }
+        "password": {
+          "type": "pointer",
+          "name": "RPC Password",
+          "description": "The password for Bitcoin Core's RPC interface",
+          "subtype": "package",
+          "package-id": "bitcoind",
+          "target": "config",
+          "multi": false,
+          "selector": "$.rpc.password"
+        }
+      },
+      "internal-proxy": {
+        "user": {
+          "type": "pointer",
+          "name": "RPC Username",
+          "description": "The username for the RPC user allocated to electrs",
+          "subtype": "package",
+          "package-id": "btc-rpc-proxy",
+          "target": "config",
+          "multi": false,
+          "selector": "$.users[?(@.name == \"electrs\")].name"
         },
-        "advanced": {
-          "type": "object",
-          "name": "Advanced",
-          "description": "Advanced settings for Bitcoin Proxy",
-          "spec": {
-            "log-filters": {
-              "type": "enum",
-              "name": "Log Filters",
-              "values": [
-                "ERROR",
-                "WARN",
-                "INFO",
-                "DEBUG",
-                "TRACE"
-              ],
-              "value-names": {
-                "ERROR": "Error",
-                "WARN": "Warning",
-                "INFO": "Info",
-                "DEBUG": "Debug",
-                "TRACE": "Trace"
-              },
-              "default": "INFO"
-            },
-            "index-batch-size": {
-              "type": "number",
-              "name": "Index Batch Size",
-              "description": "Maximum number of blocks to request from bitcoind per batch\n",
-              "nullable": true,
-              "range": "[1,10000]",
-              "integral": true,
-              "units": "blocks"
-            },
-            "index-lookup-limit": {
-              "type": "number",
-              "name": "Index Lookup Limit",
-              "description": "Number of transactions to lookup before returning an error, to prevent 'too popular' addresses from causing the RPC server to get stuck (0 - disable the limit)\"\n",
-              "nullable": true,
-              "range": "[1,10000]",
-              "integral": true,
-              "units": "transactions"
-            }
-          }
+        "password": {
+          "type": "pointer",
+          "name": "RPC Password",
+          "description": "The password for the RPC user allocated to electrs",
+          "subtype": "package",
+          "package-id": "btc-rpc-proxy",
+          "target": "config",
+          "multi": false,
+          "selector": "$.users[?(@.name == \"electrs\")].password"
         }
       }
     }
-  };
-}
+  },
+  "advanced": {
+    "type": "object",
+    "name": "Advanced",
+    "description": "Advanced settings for Bitcoin Proxy",
+    "spec": {
+      "log-filters": {
+        "type": "enum",
+        "name": "Log Filters",
+        "values": [
+          "ERROR",
+          "WARN",
+          "INFO",
+          "DEBUG",
+          "TRACE"
+        ],
+        "value-names": {
+          "ERROR": "Error",
+          "WARN": "Warning",
+          "INFO": "Info",
+          "DEBUG": "Debug",
+          "TRACE": "Trace"
+        },
+        "default": "INFO"
+      },
+      "index-batch-size": {
+        "type": "number",
+        "name": "Index Batch Size",
+        "description": "Maximum number of blocks to request from bitcoind per batch\n",
+        "nullable": true,
+        "range": "[1,10000]",
+        "integral": true,
+        "units": "blocks"
+      },
+      "index-lookup-limit": {
+        "type": "number",
+        "name": "Index Lookup Limit",
+        "description": "Number of transactions to lookup before returning an error, to prevent 'too popular' addresses from causing the RPC server to get stuck (0 - disable the limit)\"\n",
+        "nullable": true,
+        "range": "[1,10000]",
+        "integral": true,
+        "units": "transactions"
+      }
+    }
+  }
+})

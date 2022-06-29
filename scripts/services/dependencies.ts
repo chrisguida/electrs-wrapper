@@ -1,4 +1,4 @@
-import { ExpectedExports, Config, matches } from "../deps.ts";
+import { types as T, matches } from "../deps.ts";
 
 const { shape, arrayOf, string, boolean } = matches;
 
@@ -31,8 +31,8 @@ function randomItemString(input: string) {
 const serviceName = "electrs";
 const fullChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 type Check = {
-  currentError(config: Config): string | void;
-  fix(config: Config): void;
+  currentError(config: T.Config): string | void;
+  fix(config: T.Config): void;
 };
 
 const proxyChecks: Array<Check> = [
@@ -47,6 +47,9 @@ const proxyChecks: Array<Check> = [
       return `Must have an RPC user named "${serviceName}"`;
     },
     fix(config) {
+      if (!matchProxyConfig.test(config)) {
+        return
+      }
       config.users.push({
         name: serviceName,
         "allowed-calls": [],
@@ -115,6 +118,9 @@ const bitcoindChecks: Array<Check> = [
       return;
     },
     fix(config) {
+      if (!matchBitcoindConfig.test(config)) {
+        return;
+      }
       config.rpc.enable = true;
     },
   },
@@ -129,6 +135,9 @@ const bitcoindChecks: Array<Check> = [
       return;
     },
     fix(config) {
+      if (!matchBitcoindConfig.test(config)) {
+        return;
+      }
       config.advanced.peers.listen = true;
     },
   },
@@ -143,13 +152,17 @@ const bitcoindChecks: Array<Check> = [
       return;
     },
     fix(config) {
+      if (!matchBitcoindConfig.test(config)) {
+        return;
+      }
       config.advanced.pruning.mode = "disabled";
     },
   },
 ];
 
-export const dependencies: ExpectedExports.dependencies = {
+export const dependencies: T.ExpectedExports.dependencies = {
   "btc-rpc-proxy": {
+    // deno-lint-ignore require-await
     async check(effects, configInput) {
       effects.info("check btc-rpc-proxy");
       for (const checker of proxyChecks) {
@@ -161,6 +174,7 @@ export const dependencies: ExpectedExports.dependencies = {
       }
       return { result: null };
     },
+    // deno-lint-ignore require-await
     async autoConfigure(effects, configInput) {
       effects.info("autoconfigure btc-rpc-proxy");
       for (const checker of proxyChecks) {
@@ -173,6 +187,7 @@ export const dependencies: ExpectedExports.dependencies = {
     },
   },
   bitcoind: {
+    // deno-lint-ignore require-await
     async check(effects, configInput) {
       effects.info("check bitcoind");
       for (const checker of bitcoindChecks) {
@@ -184,6 +199,7 @@ export const dependencies: ExpectedExports.dependencies = {
       }
       return { result: null };
     },
+    // deno-lint-ignore require-await
     async autoConfigure(effects, configInput) {
       effects.info("autoconfigure bitcoind");
       for (const checker of bitcoindChecks) {
