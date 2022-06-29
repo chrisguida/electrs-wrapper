@@ -16,7 +16,7 @@ clean:
 	rm -f image.tar
 	rm -f electrs.s9pk
 
-electrs.s9pk: manifest.yaml assets/compat/* image.tar instructions.md $(ASSET_PATHS)
+electrs.s9pk: manifest.yaml assets/compat/* image.tar instructions.md $(ASSET_PATHS) scripts/embassy.js
 	embassy-sdk pack
 
 image.tar: Dockerfile check*.sh docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(ELECTRS_SRC)
