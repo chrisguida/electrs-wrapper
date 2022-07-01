@@ -3,7 +3,9 @@
 id: electrs
 title: "electrs"
 version: 0.9.7.1
-release-notes: "Version bump for latest Bitcoin"
+release-notes: |
+  * Version bump for latest Bitcoin
+  * Switch to using new EOS APIs for faster configuration and properties
 license: mit
 wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
 upstream-repo: "https://github.com/romanz/electrs"
