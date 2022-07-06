@@ -4,8 +4,8 @@ id: electrs
 title: "electrs"
 version: 0.9.7.1
 release-notes: |
-  * Version bump for latest Bitcoin
-  * Switch to using new EOS APIs for faster configuration and properties
+  * New/improved wallet integration guides for BitBox, BlueWallet, Electrum, Sparrow, and Trezor
+  * Switch to using new eOS APIs for faster configuration and properties
 license: mit
 wrapper-repo: "https://github.com/Start9Labs/electrs-wrapper"
 upstream-repo: "https://github.com/romanz/electrs"
