@@ -12,6 +12,19 @@ Available for:
 
 [Setup guide](./integrations/bitbox/guide.md)
 
+## Blockstream Green
+
+https://blockstream.com/green/
+
+Available for:
+- Android
+- iOS
+- Linux
+- Mac
+- Windows
+
+[Setup guide](./integrations/blockstreamgreen/guide.md)
+
 ## BlueWallet
 
 https://bluewallet.io/
