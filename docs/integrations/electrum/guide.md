@@ -8,7 +8,7 @@ Caution: This will add your Electrum server, but if you want to ONLY connect to 
 
     ![Select Server](./assets/electrum0.png)
 
-1. On the following screen, uncheck "Select server automatically," and add in your electrs onion address (found in your Embassy's electrs service page, under "Interfaces").  Remove the "http://" prefix, and add ":50001:t" to indicate the port (50001) and protocol (TCP).  Then click "Next."
+1. On the following screen, uncheck "Select server automatically," and paste in your electrs `Quick Connect URL` (found in your Embassy web interface, under Services > Electrs > Properties).  Then click "Next."
 
     ![Server Setup](./assets/electrum2.png)
     
